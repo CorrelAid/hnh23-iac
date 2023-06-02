@@ -1,0 +1,7 @@
+---
+user: correlaid
+domain: cms.correlaid.org
+storage_account_name: correlaiddirectusstorage
+storage_container_name: correlaiddirectuscont
+storage_url: https://correlaiddirectusstorage.blob.core.windows.net/
+smtp_user: bot@correlaid.org

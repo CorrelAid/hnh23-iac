@@ -1,0 +1,77 @@
+version: '3'
+services:
+
+  cache:
+    restart: always
+    container_name: cache
+    image: redis:6-alpine
+    networks:
+      - directus
+    ports:
+      - 6379
+
+  directus:
+    restart: always
+    container_name: directus
+    image: directus/directus:latest
+    ports:
+      - 8055:8055
+    networks:
+      - directus
+      - caddy
+    depends_on:
+      - cache
+     
+    environment:
+      KEY: '{{  directus_key  }}'
+      SECRET: '{{  directus_secret  }}'
+
+      DB_CLIENT: 'pg'
+      DB_CONNECTION_STRING: '{{ db_connection_string }}'
+      DB_POOL__MIN: "10"
+      DB_POOL__MAX: "50"
+
+
+      CACHE_ENABLED: 'true'
+      CACHE_STORE: 'redis'
+      CACHE_REDIS: 'redis://cache:6379'
+      CACHE_TTL: "5s"
+
+      STORAGE_LOCATIONS: "s3"
+      STORAGE_S3_DRIVER: "s3" 
+      STORAGE_S3_KEY: "{{ wasabi_access_key }}"
+      STORAGE_S3_SECRET: "{{ wasabi_secret_key }}"
+      STORAGE_S3_BUCKET: "{{ wasabi_bucket }}"
+      STORAGE_S3_REGION: "eu-central-2"
+      STORAGE_S3_ENDPOINT: "s3.eu-central-2.wasabisys.com"
+
+      ADMIN_EMAIL: '{{ directus_admin_mail }}'
+      ADMIN_PASSWORD: '{{  directus_admin_pw  }}'
+
+      EMAIL_TRANSPORT: 'smtp'
+      EMAIL_FROM: '{{ smtp_user }}'
+      EMAIL_SMTP_HOST: 'smtp.gmail.com'
+      EMAIL_SMTP_PORT: 465
+      EMAIL_SMTP_USER: '{{ smtp_user }}'
+      EMAIL_SMTP_PASSWORD: "{{ smtp_password }}"
+      EMAIL_SMTP_SECURE: 'true'
+
+      PUBLIC_URL: "https://{{  domain  }}"
+
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: "true"
+    
+    labels:
+      caddy: "{{ domain }}"
+      caddy.reverse_proxy: "{{"{{upstreams 8055}}"}}"
+
+  
+
+networks:
+  caddy:
+    external: true
+  directus:
+
+volumes:
+  caddy_data: {}
+
