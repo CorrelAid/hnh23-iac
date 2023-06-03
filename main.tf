@@ -36,9 +36,20 @@ resource "hcloud_firewall" "firewall" {
 
 }
 
-resource "hcloud_ssh_key" "default" {
-  name       = var.ssh_public_key_name
+resource "tls_private_key" "ssh" {
+  algorithm = "RSA"
+  rsa_bits  = "4096"
+}
+
+
+resource "hcloud_ssh_key" "user" {
+  name       = "user"
   public_key = var.ssh_key
+}
+
+resource "hcloud_ssh_key" "machine" {
+  name       = "machine"
+  public_key = tls_private_key.ssh.public_key_openssh
 }
 
 resource "hcloud_volume" "main" {
@@ -57,7 +68,7 @@ resource "hcloud_server" "main" {
   location    = var.server.location
   backups     = var.server.backups
   firewall_ids = [hcloud_firewall.firewall.id]
-  ssh_keys    = [var.ssh_public_key_name]
+  ssh_keys    = ["user",]
   user_data = <<EOF
 #cloud-config
 locale: en_US.UTF-8
@@ -87,8 +98,6 @@ runcmd:
   - install -m 0755 -d /etc/apt/keyrings
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
   - chmod a+r /etc/apt/keyrings/docker.gpg
-  - ufw allow OpenSSH
-  - ufw --force enable
   - echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
   - apt-get update -y
   - apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin a
@@ -124,4 +133,14 @@ resource "hetznerdns_record" "main" {
   name    = var.directus_domain
   value   = hcloud_server.main.ipv4_address
   type    = "A"
+}
+
+provider "docker" {
+  host     = "ssh://root@${hcloud_server.main.ipv4_address}:22"
+  ssh_opts = ["-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null", "-i", "<(echo ${tls_private_key.ssh.private_key_pem})"]
+}
+
+# Pulls the image
+resource "docker_image" "ubuntu" {
+  name = "ubuntu:latest"
 }
