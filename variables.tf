@@ -47,11 +47,7 @@ variable "volume_filesystem" {
 }
 
 variable "ssh_key"{
-  
-}
 
-variable "sub_domain" {
-  default = "basel-viz"
 }
 
 variable "zone" {

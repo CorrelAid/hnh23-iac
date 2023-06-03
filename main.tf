@@ -70,7 +70,7 @@ resource "hcloud_volume_attachment" "main" {
 
 resource "hetznerdns_record" "main" {
   zone_id = data.hetznerdns_zone.dns_zone.id
-  name    = var.sub_domain
+  name    = var.directus_domain
   value   = hcloud_server.main.ipv4_address
   type    = "A"
 }
