@@ -36,6 +36,11 @@ resource "hcloud_firewall" "firewall" {
 
 }
 
+resource "hcloud_ssh_key" "default" {
+  name       = var.ssh_public_key_name
+  public_key = var.ssh_key
+}
+
 resource "hcloud_volume" "main" {
   name      = "docker_data_volume"
   size      = var.volume_size
@@ -52,7 +57,7 @@ resource "hcloud_server" "main" {
   location    = var.server.location
   backups     = var.server.backups
   firewall_ids = [hcloud_firewall.firewall.id]
-  ssh_keys    = [var.ssh_key]
+  ssh_keys    = [var.ssh_public_key_name]
   user_data = templatefile("${path.module}/user_data/user-data.yml", {
     docker_compose_version = var.docker_compose_version
     volume_filesystem      = var.volume_filesystem

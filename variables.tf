@@ -84,3 +84,9 @@ variable "directus_domain"{
 }
 
 
+
+variable "ssh_public_key_name" {
+  type        = string
+  description = "SSH Public Key Name"
+  default     = "default"
+}
