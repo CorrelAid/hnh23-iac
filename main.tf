@@ -36,7 +36,7 @@ resource "hcloud_firewall" "firewall" {
 
 }
 
-resource "hcloud_volume" "master" {
+resource "hcloud_volume" "main" {
   name      = "docker_data_volume"
   size      = var.volume_size
   location  = var.server.location
@@ -52,7 +52,7 @@ resource "hcloud_server" "main" {
   location    = var.server.location
   backups     = var.server.backups
   firewall_ids = [hcloud_firewall.firewall.id]
-  ssh_keys    = file("~/.ssh/id_rsa.pub")
+  ssh_keys    = var.ssh_key
   user_data = templatefile("${path.module}/user_data/user-data.yaml", {
     docker_compose_version = var.docker_compose_version
     volume_filesystem      = var.volume_filesystem
@@ -63,8 +63,8 @@ resource "hcloud_server" "main" {
 }
 
 resource "hcloud_volume_attachment" "main" {
-  volume_id = hcloud_volume.master.id
-  server_id = hcloud_server.server.id
+  volume_id = hcloud_volume.main.id
+  server_id = hcloud_server.main.id
   automount = true
 }
 
