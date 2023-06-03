@@ -1,22 +1,15 @@
 
-variable "image_name" {
-  default = "hnh23"
-}
-
-variable "ip_range" {
-  default = "10.0.1.0/24"
-}
-
-variable "server_type" {
-  default = "cx11"
-}
-
-variable "server_os" {
-  default = "ubuntu-20.04"
-}
-
-variable "server_username" {
-  default = "user"
+# Optional configuration
+variable "server" {
+  type        = map(any)
+  description = "Server configuration map"
+  default = {
+    name        = "docker-host"
+    server_type = "cx11"
+    image       = "ubuntu-22.04"
+    location    = "nbg1"
+    backups     = false
+  }
 }
 
 variable "sub_domain" {

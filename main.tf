@@ -2,8 +2,6 @@ data "hetznerdns_zone" "dns_zone" {
   name = var.zone
 }
 
-
-
 resource "hcloud_firewall" "firewall" {
   name = "docker_host"
   rule {
