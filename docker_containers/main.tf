@@ -4,7 +4,7 @@ terraform {
     docker = {
       source  = "kreuzwerker/docker"
       version = "3.0.2"
-      configuration_aliases = [ docker.docker ]
+      configuration_aliases = [ docker.main_ ]
     }
   }
 }
