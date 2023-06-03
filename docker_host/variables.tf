@@ -1,4 +1,3 @@
-
 # Optional configuration
 variable "server" {
   type        = map(any)
@@ -82,6 +81,3 @@ variable "directus_domain"{
   type = string
   default = "kdb-cms"
 }
-
-
-
