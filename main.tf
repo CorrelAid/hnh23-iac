@@ -58,13 +58,60 @@ resource "hcloud_server" "main" {
   backups     = var.server.backups
   firewall_ids = [hcloud_firewall.firewall.id]
   ssh_keys    = [var.ssh_public_key_name]
-  user_data = templatefile("${path.module}/user_data/user-data.yml", {
-    docker_compose_version = var.docker_compose_version
-    volume_filesystem      = var.volume_filesystem
-    filesystem_cmd_opt     = var.volume_filesystem == "xfs" ? "-f" : "-F"
-    linux_device           = hcloud_volume.main.linux_device
-    mount_dir_name         = hcloud_volume.main.name
-  })
+  user_data = <<EOF
+#cloud-config
+locale: en_US.UTF-8
+timezone: Europe/Berlin
+package_update: true
+package_upgrade: true
+package_reboot_if_required: false
+manage_etc_hosts: true
+locale: en_US.UTF-8
+timezone: Europe/Berlin
+
+
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg-agent
+  - software-properties-common
+  - fail2ban
+  - unattended-upgrades
+
+runcmd:
+  - mkfs.${volume_filesystem} ${filesystem_cmd_opt} ${linux_device}
+  - mkdir /mnt/${mount_dir_name}
+  - mount -o discard,defaults ${linux_device} /mnt/${mount_dir_name}
+  - echo '${linux_device} /mnt/${mount_dir_name} ${volume_filesystem} discard,nofail,defaults 0 0' >> /etc/fstab
+  - install -m 0755 -d /etc/apt/keyrings
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  - chmod a+r /etc/apt/keyrings/docker.gpg
+  - ufw allow OpenSSH
+  - ufw --force enable
+  - echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+  - apt-get update -y
+  - apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin 
+  - echo '${linux_device} /mnt/${mount_dir_name} ${volume_filesystem} discard,nofail,defaults 0 0' >> /etc/fstab
+  - printf "[sshd]\nenabled = true\nbanaction = iptables-multiport" > /etc/fail2ban/jail.local
+  - systemctl enable fail2ban
+  - apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  - sed -i -e '/^\(#\|\)PermitRootLogin/s/^.*$/PermitRootLogin no/' /etc/ssh/sshd_config
+  - sed -i -e '/^\(#\|\)PasswordAuthentication/s/^.*$/PasswordAuthentication no/' /etc/ssh/sshd_config
+  - sed -i -e '/^\(#\|\)X11Forwarding/s/^.*$/X11Forwarding no/' /etc/ssh/sshd_config
+  - sed -i -e '/^\(#\|\)MaxAuthTries/s/^.*$/MaxAuthTries 2/' /etc/ssh/sshd_config
+  - sed -i -e '/^\(#\|\)AllowTcpForwarding/s/^.*$/AllowTcpForwarding no/' /etc/ssh/sshd_config
+  - sed -i -e '/^\(#\|\)AllowAgentForwarding/s/^.*$/AllowAgentForwarding no/' /etc/ssh/sshd_config
+  - sed -i -e '/^\(#\|\)AuthorizedKeysFile/s/^.*$/AuthorizedKeysFile .ssh\/authorized_keys/' /etc/ssh/sshd_config
+  - sed -i '$a AllowUsers holu' /etc/ssh/sshd_config
+  - sed -i -e "s|ExecStart=/usr/bin/dockerd|ExecStart=/usr/bin/dockerd --data-root=/mnt/${mount_dir_name}|g" /lib/systemd/system/docker.service
+  - systemctl daemon-reload
+  - systemctl restart docker
+  - systemctl enable docker
+
+final_message: "The system is ready, after $UPTIME seconds"
+
+EOF
 }
 
 resource "hcloud_volume_attachment" "main" {
