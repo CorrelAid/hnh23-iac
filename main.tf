@@ -36,6 +36,14 @@ resource "hcloud_firewall" "firewall" {
 
 }
 
+resource "hcloud_volume" "master" {
+  name      = "docker_data_volume"
+  size      = var.volume_size
+  location  = var.server.location
+  automount = false
+  format    = var.volume_filesystem
+}
+
 # Create server for deployment
 resource "hcloud_server" "main" {
   name        = var.server.name
@@ -52,6 +60,12 @@ resource "hcloud_server" "main" {
     linux_device           = hcloud_volume.master.linux_device
     mount_dir_name         = hcloud_volume.master.name
   })
+}
+
+resource "hcloud_volume_attachment" "main" {
+  volume_id = hcloud_volume.master.id
+  server_id = hcloud_server.server.id
+  automount = true
 }
 
 resource "hetznerdns_record" "main" {
