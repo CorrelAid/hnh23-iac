@@ -50,7 +50,7 @@ services:
 
       EMAIL_TRANSPORT: 'smtp'
       EMAIL_FROM: '{{ smtp_user }}'
-      EMAIL_SMTP_HOST: 'smtp.gmail.com'
+      EMAIL_SMTP_HOST: 'mail.your-server.de'
       EMAIL_SMTP_PORT: 465
       EMAIL_SMTP_USER: '{{ smtp_user }}'
       EMAIL_SMTP_PASSWORD: "{{ smtp_password }}"
