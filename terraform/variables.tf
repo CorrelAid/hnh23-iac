@@ -85,3 +85,7 @@ variable "directus_domain"{
 variable "vault_pw"{
   type = string
 }
+
+variable "ssh_key_name"{
+  default = "default"
+}
