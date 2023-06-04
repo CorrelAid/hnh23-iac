@@ -82,6 +82,6 @@ variable "directus_domain"{
   default = "kdb-cms"
 }
 
-variable "machine_public_key" {
-type = string
+variable "vault_pw"{
+  type = string
 }

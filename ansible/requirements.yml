@@ -1,0 +1,7 @@
+---
+roles:
+  - name: jstet.initial_server_setup
+  - name: caddy_ansible.caddy_ansible
+collections:
+  - name: community.general
+

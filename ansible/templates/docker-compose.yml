@@ -1,5 +1,28 @@
 version: '3'
 services:
+  minio:
+    image: minio/minio
+    ports:
+      - "9000"
+      - "9001"
+    volumes:
+      - minio_storage:/data
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    command: server --console-address ":9001" /data
+  
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set main http://minio:9000 minio minio123;
+      /usr/bin/mc mb main/main;
+      /usr/bin/mc policy set public main/main;
+      exit 0;
+      "
 
   cache:
     restart: always
@@ -9,6 +32,20 @@ services:
       - directus
     ports:
       - 6379
+
+  database:
+    container_name: database
+    ports:
+      - 8055
+    image: postgis/postgis:13-master
+    volumes:
+      - ./data/database:/var/lib/postgresql/data
+    networks:
+      - directus
+    environment:
+      POSTGRES_USER: 'directus'
+      POSTGRES_PASSWORD: 'directus'
+      POSTGRES_DB: 'directus'
 
   directus:
     restart: always
@@ -27,9 +64,11 @@ services:
       SECRET: '{{  directus_secret  }}'
 
       DB_CLIENT: 'pg'
-      DB_CONNECTION_STRING: '{{ db_connection_string }}'
-      DB_POOL__MIN: "10"
-      DB_POOL__MAX: "50"
+      DB_HOST: 'database'
+      DB_PORT: '5432'
+      DB_DATABASE: 'directus'
+      DB_USER: 'directus'
+      DB_PASSWORD: 'directus'
 
 
       CACHE_ENABLED: 'true'
@@ -39,11 +78,10 @@ services:
 
       STORAGE_LOCATIONS: "s3"
       STORAGE_S3_DRIVER: "s3" 
-      STORAGE_S3_KEY: "{{ wasabi_access_key }}"
-      STORAGE_S3_SECRET: "{{ wasabi_secret_key }}"
-      STORAGE_S3_BUCKET: "{{ wasabi_bucket }}"
-      STORAGE_S3_REGION: "eu-central-2"
-      STORAGE_S3_ENDPOINT: "s3.eu-central-2.wasabisys.com"
+      STORAGE_S3_KEY: "minio"
+      STORAGE_S3_SECRET: "minio123"
+      STORAGE_S3_BUCKET: "main"
+      STORAGE_S3_ENDPOINT: "http://minio:9000"
 
       ADMIN_EMAIL: '{{ directus_admin_mail }}'
       ADMIN_PASSWORD: '{{  directus_admin_pw  }}'

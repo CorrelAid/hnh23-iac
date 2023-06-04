@@ -36,8 +36,6 @@ resource "hcloud_firewall" "firewall" {
 
 }
 
-
-
 resource "hcloud_ssh_key" "user" {
   name       = "user"
   public_key = var.ssh_key
@@ -131,7 +129,46 @@ resource "hetznerdns_record" "main" {
   type    = "A"
 }
 
-output "host_ip" {
-  value = hcloud_server.main.ipv4_address
-  
+#####################
+
+# writing data to files for ansible
+
+resource "local_file" "ansible_vault" {
+  content = templatefile("vault.tmpl",
+    {
+      storage_account_key  = azurerm_storage_account.main.primary_access_key
+      directus_admin_pw    = var.directus_admin_pw
+      directus_admin_mail  = var.directus_admin_mail
+      directus_key         = var.directus_key
+      directus_secret      = var.directus_secret
+      smtp_password        = var.smtp_password
+
+    }
+  )
+  filename = "../ansible/group_vars/vault.yml"
+
+  provisioner "local-exec" {
+    command = "echo ${vault_pw} | ansible-vault encrypt ../ansible/group_vars/vault.yml --vault-password-file=/bin/cat "
+  }
 }
+
+
+resource "local_file" "ansible_inventory" {
+  content = templatefile("inventory.tmpl",
+    {
+      ip       = hcloud_server.main.ipv4_address
+    }
+  )
+  filename = "../ansible/hosts"
+}
+
+resource "local_file" "group_vars" {
+  content = templatefile("group_vars.tmpl",
+    {
+      domain                 = "${var.directus_domain}.${var.zone}"
+      smtp_user              = var.smtp_user
+    }
+  )
+  filename = "../ansible/group_vars/main.yml"
+}
+
