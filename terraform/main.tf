@@ -51,14 +51,14 @@ resource "hcloud_volume" "main" {
 
 # Create server for deployment
 resource "hcloud_server" "main" {
-  name        = var.server.name
-  image       = var.server.image
-  server_type = var.server.server_type
-  location    = var.server.location
-  backups     = var.server.backups
+  name         = var.server.name
+  image        = var.server.image
+  server_type  = var.server.server_type
+  location     = var.server.location
+  backups      = var.server.backups
   firewall_ids = [hcloud_firewall.firewall.id]
-  ssh_keys    = [var.ssh_key_name]
-  user_data = <<EOF
+  ssh_keys     = [var.ssh_key_name]
+  user_data    = <<EOF
 #cloud-config
 locale: en_US.UTF-8
 timezone: Europe/Berlin
@@ -140,22 +140,42 @@ resource "random_password" "secret" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
-resource "local_file" "ansible_inventory" {
-  content = templatefile("inventory.tmpl",
-    {
-      ip       = hcloud_server.main.ipv4_address
-    }
-  )
-  filename = "../ansible/hosts"
+resource "github_repository" "foo" {
+  name      = "CorrelAid/hnh23_iac"
+  auto_init = true
 }
 
-resource "local_file" "group_vars" {
-  content = templatefile("group_vars.tmpl",
+resource "github_repository_file" "hosts" {
+  repository = github_repository.foo.name
+  branch     = "main"
+  file       = "./ansible/hosts"
+  content = templatefile("inventory.tmpl",
     {
-      domain                 = "${var.directus_domain}.${var.zone}"
-      smtp_user              = var.smtp_user
+      ip = hcloud_server.main.ipv4_address
     }
   )
-  filename = "../ansible/group_vars/main.yml"
+  commit_message      = "Add hosts"
+  commit_author       = "Terraform User"
+  commit_email        = "terraform@example.com"
+  overwrite_on_create = true
 }
+
+
+resource "github_repository_file" "group_vars" {
+  repository = github_repository.foo.name
+  branch     = "main"
+  file       = "./ansible/hosts"
+  content = templatefile("group_vars.tmpl",
+    {
+      domain    = "${var.directus_domain}.${var.zone}"
+      smtp_user = var.smtp_user
+    }
+  )
+  commit_message      = "Add group_vars"
+  commit_author       = "Terraform User"
+  commit_email        = "terraform@example.com"
+  overwrite_on_create = true
+}
+
+
 

@@ -8,6 +8,14 @@ terraform {
       source  = "timohirt/hetznerdns"
       version = "2.2.0"
     }
-
+     github = {
+      source  = "integrations/github"
+      version = "~> 5.0"
+    }
+    
   }
+}
+
+provider "github" {
+  
 }
