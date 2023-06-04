@@ -164,7 +164,7 @@ resource "github_repository_file" "hosts" {
 resource "github_repository_file" "group_vars" {
   repository = github_repository.foo.name
   branch     = "main"
-  file       = "./ansible/hosts"
+  file       = "./ansible/group_vars/main.yml"
   content = templatefile("group_vars.tmpl",
     {
       domain    = "${var.directus_domain}.${var.zone}"
