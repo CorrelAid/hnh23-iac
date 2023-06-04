@@ -140,25 +140,6 @@ resource "random_password" "secret" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
-resource "local_file" "ansible_vault" {
-  content = templatefile("vault.tmpl",
-    {
-      directus_admin_pw    = var.directus_admin_pw
-      directus_admin_mail  = var.directus_admin_mail
-      directus_key         = random_password.key.result
-      directus_secret      = random_password.secret.result
-      smtp_pw       = var.smtp_pw
-
-    }
-  )
-  filename = "../ansible/group_vars/vault.yml"
-
-  provisioner "local-exec" {
-    command = "echo ${var.vault_pw} | ansible-vault encrypt ../ansible/group_vars/vault.yml --vault-password-file=/bin/cat "
-  }
-}
-
-
 resource "local_file" "ansible_inventory" {
   content = templatefile("inventory.tmpl",
     {
