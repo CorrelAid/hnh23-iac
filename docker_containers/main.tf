@@ -1,13 +1,4 @@
 
-terraform {
-  required_providers {
-    docker = {
-      source  = "kreuzwerker/docker"
-      version = "3.0.2"
-      configuration_aliases = [ docker.main_ ]
-    }
-  }
-}
 
 # Pulls the image
 resource "docker_image" "ubuntu" {
