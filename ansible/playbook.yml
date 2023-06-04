@@ -3,7 +3,7 @@
   gather_facts: true
   become: false
   vars_files:
-    - group_vars/main.yml
+    - group_vars/machine.yml
     - group_vars/vault.yml
 
   tasks:
