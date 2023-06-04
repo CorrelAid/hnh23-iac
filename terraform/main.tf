@@ -141,7 +141,7 @@ resource "random_password" "secret" {
 }
 
 resource "github_repository" "main" {
-  name      = "hnh23_iac"
+  name      = "/hnh23_iac"
   auto_init = true
 }
 
