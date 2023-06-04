@@ -8,7 +8,7 @@ variable "server" {
     image       = "ubuntu-22.04"
     location    = "nbg1"
     backups     = false
-    user = "users"
+    user = "user"
   }
 }
 
