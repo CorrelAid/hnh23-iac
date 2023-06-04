@@ -61,30 +61,12 @@ variable "git_repo" {
   default = "jstet/basel_viz"
 }
 
-variable "smtp_pw"{
-  type = string
-}
-
-variable "smtp_user" {
-  type = string
-}
-
-variable "directus_admin_pw" {
-  type = string
-}
-
-variable "directus_admin_mail" {
-  type = string
-}
 
 variable "directus_domain"{
   type = string
   default = "kdb-cms"
 }
 
-variable "vault_pw"{
-  type = string
-}
 
 variable "ssh_key_name"{
   default = "default"
