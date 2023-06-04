@@ -143,7 +143,6 @@ resource "random_password" "secret" {
 resource "local_file" "ansible_vault" {
   content = templatefile("vault.tmpl",
     {
-      storage_account_key  = azurerm_storage_account.main.primary_access_key
       directus_admin_pw    = var.directus_admin_pw
       directus_admin_mail  = var.directus_admin_mail
       directus_key         = random_password.key
