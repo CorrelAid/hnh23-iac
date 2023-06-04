@@ -37,8 +37,13 @@ resource "hcloud_firewall" "firewall" {
 }
 
 resource "hcloud_ssh_key" "main" {
-  name       = var.ssh_key_name
+  name       = var.ssh_key_name_user
   public_key = var.ssh_key
+}
+
+resource "hcloud_ssh_key" "machine" {
+  name       = var.ssh_key_name_machine
+  public_key = var.machine_ssh_key_public
 }
 
 resource "hcloud_volume" "main" {
@@ -57,7 +62,7 @@ resource "hcloud_server" "main" {
   location     = var.server.location
   backups      = var.server.backups
   firewall_ids = [hcloud_firewall.firewall.id]
-  ssh_keys     = [var.ssh_key_name]
+  ssh_keys     = [var.ssh_key_name_user,var.ssh_key_name_machine]
   user_data    = <<EOF
 #cloud-config
 locale: en_US.UTF-8
@@ -74,7 +79,6 @@ packages:
   - apt-transport-https
   - ca-certificates
   - curl
-  - ansible
   - gnupg-agent
   - software-properties-common
   - fail2ban
@@ -109,6 +113,14 @@ runcmd:
   - systemctl restart docker
   - systemctl enable docker
 
+users:
+  - default
+  - name: ${var.server.user}
+    groups: sudo
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    lock_passwd: true
+    shell: /bin/bash
+
 final_message: "The system is ready, after $UPTIME seconds"
 
 EOF
@@ -131,20 +143,6 @@ resource "hetznerdns_record" "main" {
 
 # writing data to files for ansible
 
-resource "random_password" "key" {
-  length           = 40
-  special          = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
-}
-
-resource "random_password" "secret" {
-  length           = 40
-  special          = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
-}
-
-
-
 resource "github_repository_file" "hosts" {
   repository = "hnh23-iac"
   branch     = "main"
@@ -152,6 +150,7 @@ resource "github_repository_file" "hosts" {
   content = templatefile("inventory.tmpl",
     {
       ip = hcloud_server.main.ipv4_address
+      user = var.server.user
     }
   )
   commit_message      = "Add hosts"

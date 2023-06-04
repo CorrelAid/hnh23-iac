@@ -8,6 +8,7 @@ variable "server" {
     image       = "ubuntu-22.04"
     location    = "nbg1"
     backups     = false
+    user = "users"
   }
 }
 
@@ -49,6 +50,10 @@ variable "ssh_key"{
 
 }
 
+variable "machine_ssh_key_public"{
+
+}
+
 variable "zone" {
   default = "correlaid.org"
 }
@@ -68,6 +73,10 @@ variable "directus_domain"{
 }
 
 
-variable "ssh_key_name"{
+variable "ssh_key_name_user"{
   default = "default"
+}
+
+variable "ssh_key_name_machine"{
+  default = "machine"
 }
