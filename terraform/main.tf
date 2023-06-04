@@ -140,9 +140,6 @@ resource "random_password" "secret" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
-data "github_repository" "main" {
-  full_name = "CorrelAid/hnh23_iac"
-}
 
 resource "github_repository_file" "hosts" {
   repository = "CorrelAid/hnh23_iac"
