@@ -133,14 +133,26 @@ resource "hetznerdns_record" "main" {
 
 # writing data to files for ansible
 
+resource "random_password" "key" {
+  length           = 40
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
+resource "random_password" "secret" {
+  length           = 40
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
 resource "local_file" "ansible_vault" {
   content = templatefile("vault.tmpl",
     {
       storage_account_key  = azurerm_storage_account.main.primary_access_key
       directus_admin_pw    = var.directus_admin_pw
       directus_admin_mail  = var.directus_admin_mail
-      directus_key         = var.directus_key
-      directus_secret      = var.directus_secret
+      directus_key         = random_password.key
+      directus_secret      = random_password.secret
       smtp_password        = var.smtp_password
 
     }
