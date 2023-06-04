@@ -21,7 +21,7 @@ variable "docker_compose_version" {
 variable "volume_size" {
   type        = number
   description = "Volume size (GB) (min 10, max 10240)"
-  default     = 10 # https://docs.hetzner.cloud/#volumes-create-a-volume
+  default     = 50 # https://docs.hetzner.cloud/#volumes-create-a-volume
   validation {
     condition     = ceil(var.volume_size) == var.volume_size
     error_message = "Volume size must be a whole number between 10 and 10240."

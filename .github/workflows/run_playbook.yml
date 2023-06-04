@@ -1,11 +1,6 @@
 name: Run Ansible Playbook
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "ansible/**"
   workflow_dispatch:
 
 jobs:
