@@ -161,11 +161,10 @@ resource "github_repository_file" "hosts" {
 resource "github_repository_file" "group_vars" {
   repository = "hnh23-iac"
   branch     = "main"
-  file       = "./ansible/group_vars/main.yml"
+  file       = "./ansible/group_vars/machine.yml"
   content = templatefile("group_vars.tmpl",
     {
       domain    = "${var.directus_domain}.${var.zone}"
-      smtp_user = var.smtp_user
     }
   )
   commit_message      = "Add group_vars"
