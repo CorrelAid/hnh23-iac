@@ -41,11 +41,6 @@ resource "hcloud_ssh_key" "user" {
   public_key = var.ssh_key
 }
 
-resource "hcloud_ssh_key" "machine" {
-  name       = "machine"
-  public_key = var.machine_public_key
-}
-
 resource "hcloud_volume" "main" {
   name      = "docker_data_volume"
   size      = var.volume_size
@@ -62,7 +57,7 @@ resource "hcloud_server" "main" {
   location    = var.server.location
   backups     = var.server.backups
   firewall_ids = [hcloud_firewall.firewall.id]
-  ssh_keys    = ["user",]
+  ssh_keys    = ["user"]
   user_data = <<EOF
 #cloud-config
 locale: en_US.UTF-8
