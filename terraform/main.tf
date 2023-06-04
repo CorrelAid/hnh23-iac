@@ -155,7 +155,7 @@ resource "local_file" "ansible_vault" {
   filename = "../ansible/group_vars/vault.yml"
 
   provisioner "local-exec" {
-    command = "echo ${vault_pw} | ansible-vault encrypt ../ansible/group_vars/vault.yml --vault-password-file=/bin/cat "
+    command = "echo ${var.vault_pw} | ansible-vault encrypt ../ansible/group_vars/vault.yml --vault-password-file=/bin/cat "
   }
 }
 
