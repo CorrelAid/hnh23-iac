@@ -4,7 +4,7 @@ variable "server" {
   description = "Server configuration map"
   default = {
     name        = "docker-host"
-    server_type = "cx11"
+    server_type = "cx21"
     image       = "ubuntu-22.04"
     location    = "nbg1"
     backups     = false
