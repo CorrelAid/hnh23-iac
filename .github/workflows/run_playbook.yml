@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-playbooks:
+  run-playbook:
     runs-on: ubuntu-latest
     steps:
       - name: checkout repo
