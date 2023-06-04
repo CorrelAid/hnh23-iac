@@ -140,13 +140,10 @@ resource "random_password" "secret" {
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
-resource "github_repository" "main" {
-  name      = "CorrelAid/hnh23_iac"
-  auto_init = true
-}
+
 
 resource "github_repository_file" "hosts" {
-  repository = github_repository.main.name
+  repository = "/hnh23-iac"
   branch     = "main"
   file       = "./ansible/hosts"
   content = templatefile("inventory.tmpl",
@@ -162,7 +159,7 @@ resource "github_repository_file" "hosts" {
 
 
 resource "github_repository_file" "group_vars" {
-  repository = github_repository.main.name
+  repository = "/hnh23-iac"
   branch     = "main"
   file       = "./ansible/group_vars/main.yml"
   content = templatefile("group_vars.tmpl",
