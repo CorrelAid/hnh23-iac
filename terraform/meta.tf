@@ -10,12 +10,12 @@ terraform {
     }
      github = {
       source  = "integrations/github"
-      version = "5.26.0"
+      version = "4.18.0"
     }
     
   }
 }
 
 provider "github" {
-
+  owner = "CorrelAid"
 }
