@@ -41,11 +41,6 @@ resource "hcloud_ssh_key" "user" {
   public_key = var.ssh_key
 }
 
-resource "hcloud_ssh_key" "machine" {
-  name       = "machine"
-  public_key = var.machine_public_key
-}
-
 resource "hcloud_volume" "main" {
   name      = "docker_data_volume"
   size      = var.volume_size
@@ -62,7 +57,7 @@ resource "hcloud_server" "main" {
   location    = var.server.location
   backups     = var.server.backups
   firewall_ids = [hcloud_firewall.firewall.id]
-  ssh_keys    = ["user",]
+  ssh_keys    = ["user"]
   user_data = <<EOF
 #cloud-config
 locale: en_US.UTF-8
@@ -133,22 +128,33 @@ resource "hetznerdns_record" "main" {
 
 # writing data to files for ansible
 
+resource "random_password" "key" {
+  length           = 40
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
+resource "random_password" "secret" {
+  length           = 40
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
 resource "local_file" "ansible_vault" {
   content = templatefile("vault.tmpl",
     {
-      storage_account_key  = azurerm_storage_account.main.primary_access_key
       directus_admin_pw    = var.directus_admin_pw
       directus_admin_mail  = var.directus_admin_mail
-      directus_key         = var.directus_key
-      directus_secret      = var.directus_secret
-      smtp_password        = var.smtp_password
+      directus_key         = random_password.key.result
+      directus_secret      = random_password.secret.result
+      smtp_pw       = var.smtp_pw
 
     }
   )
   filename = "../ansible/group_vars/vault.yml"
 
   provisioner "local-exec" {
-    command = "echo ${vault_pw} | ansible-vault encrypt ../ansible/group_vars/vault.yml --vault-password-file=/bin/cat "
+    command = "echo ${var.vault_pw} | ansible-vault encrypt ../ansible/group_vars/vault.yml --vault-password-file=/bin/cat "
   }
 }
 
