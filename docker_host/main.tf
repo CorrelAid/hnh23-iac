@@ -36,10 +36,6 @@ resource "hcloud_firewall" "firewall" {
 
 }
 
-resource "tls_private_key" "ssh" {
-  algorithm = "RSA"
-  rsa_bits  = "4096"
-}
 
 
 resource "hcloud_ssh_key" "user" {
@@ -49,7 +45,7 @@ resource "hcloud_ssh_key" "user" {
 
 resource "hcloud_ssh_key" "machine" {
   name       = "machine"
-  public_key = tls_private_key.ssh.public_key_openssh
+  public_key = var.machine_public_key
 }
 
 resource "hcloud_volume" "main" {
@@ -138,8 +134,4 @@ resource "hetznerdns_record" "main" {
 output "host_ip" {
   value = hcloud_server.main.ipv4_address
   
-}
-
-output "ssh_key" {
-  value= tls_private_key.ssh.private_key_pem
 }

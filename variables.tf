@@ -18,3 +18,15 @@ variable "directus_admin_mail" {
   type = string
 }
 
+
+variable "domain" {
+  default = "kdb-cms.correlaid.org"
+}
+
+variable "mmachine_private_key" {
+type = string
+}
+
+variable "machine_public_key" {
+type = string
+}
