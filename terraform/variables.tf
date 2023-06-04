@@ -1,4 +1,3 @@
-
 # Optional configuration
 variable "server" {
   type        = map(any)
@@ -83,10 +82,6 @@ variable "directus_domain"{
   default = "kdb-cms"
 }
 
-
-
-variable "ssh_public_key_name" {
-  type        = string
-  description = "SSH Public Key Name"
-  default     = "default"
+variable "vault_pw"{
+  type = string
 }

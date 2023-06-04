@@ -36,9 +36,14 @@ resource "hcloud_firewall" "firewall" {
 
 }
 
-resource "hcloud_ssh_key" "default" {
-  name       = var.ssh_public_key_name
+resource "hcloud_ssh_key" "user" {
+  name       = "user"
   public_key = var.ssh_key
+}
+
+resource "hcloud_ssh_key" "machine" {
+  name       = "machine"
+  public_key = var.machine_public_key
 }
 
 resource "hcloud_volume" "main" {
@@ -57,7 +62,7 @@ resource "hcloud_server" "main" {
   location    = var.server.location
   backups     = var.server.backups
   firewall_ids = [hcloud_firewall.firewall.id]
-  ssh_keys    = [var.ssh_public_key_name]
+  ssh_keys    = ["user",]
   user_data = <<EOF
 #cloud-config
 locale: en_US.UTF-8
@@ -87,8 +92,6 @@ runcmd:
   - install -m 0755 -d /etc/apt/keyrings
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
   - chmod a+r /etc/apt/keyrings/docker.gpg
-  - ufw allow OpenSSH
-  - ufw --force enable
   - echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
   - apt-get update -y
   - apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin a
@@ -125,3 +128,47 @@ resource "hetznerdns_record" "main" {
   value   = hcloud_server.main.ipv4_address
   type    = "A"
 }
+
+#####################
+
+# writing data to files for ansible
+
+resource "local_file" "ansible_vault" {
+  content = templatefile("vault.tmpl",
+    {
+      storage_account_key  = azurerm_storage_account.main.primary_access_key
+      directus_admin_pw    = var.directus_admin_pw
+      directus_admin_mail  = var.directus_admin_mail
+      directus_key         = var.directus_key
+      directus_secret      = var.directus_secret
+      smtp_password        = var.smtp_password
+
+    }
+  )
+  filename = "../ansible/group_vars/vault.yml"
+
+  provisioner "local-exec" {
+    command = "echo ${vault_pw} | ansible-vault encrypt ../ansible/group_vars/vault.yml --vault-password-file=/bin/cat "
+  }
+}
+
+
+resource "local_file" "ansible_inventory" {
+  content = templatefile("inventory.tmpl",
+    {
+      ip       = hcloud_server.main.ipv4_address
+    }
+  )
+  filename = "../ansible/hosts"
+}
+
+resource "local_file" "group_vars" {
+  content = templatefile("group_vars.tmpl",
+    {
+      domain                 = "${var.directus_domain}.${var.zone}"
+      smtp_user              = var.smtp_user
+    }
+  )
+  filename = "../ansible/group_vars/main.yml"
+}
+
