@@ -23,7 +23,7 @@ variable "domain" {
   default = "kdb-cms.correlaid.org"
 }
 
-variable "mmachine_private_key" {
+variable "machine_private_key" {
 type = string
 }
 
