@@ -120,6 +120,9 @@ users:
     sudo: "ALL=(ALL) NOPASSWD:ALL"
     lock_passwd: true
     shell: /bin/bash
+    ssh_authorized_keys:
+    - ${var.ssh_key}
+    - ${var.machine_ssh_key_public}
 
 final_message: "The system is ready, after $UPTIME seconds"
 
