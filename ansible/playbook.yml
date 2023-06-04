@@ -9,15 +9,15 @@
   tasks:
     - name: Create dir for docker compose
       file:
-        path: "/home/{{  user  }}/app"
+        path: "/home/{{  ansible_user   }}/app"
         state: directory
-        owner: "{{  user  }}"
+        owner: "{{  ansible_user   }}"
         mode: 0775
 
     - name: Template docker compose to server
       template:
         src: "templates/docker-compose.yml"
-        dest: "/home/{{  user  }}/app/docker-compose.yml"
+        dest: "/home/{{  ansible_user   }}/app/docker-compose.yml"
 
     - name: creating network
       shell: |
@@ -26,15 +26,15 @@
     
     - name: Create dir for docker compose
       file:
-        path: "/home/{{  user  }}/caddy"
+        path: "/home/{{  ansible_user   }}/caddy"
         state: directory
-        owner: "{{  user  }}"
+        owner: "{{  ansible_user   }}"
         mode: 0775
 
     - name: copy caddy docker compose to server
       copy: 
         src: files/docker-compose.yml
-        dest: "/home/{{  user  }}/caddy/docker-compose.yml"
+        dest: "/home/{{  ansible_user   }}/caddy/docker-compose.yml"
 
     - name: deploying caddy
       shell: |

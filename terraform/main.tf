@@ -113,10 +113,13 @@ runcmd:
   - systemctl restart docker
   - systemctl enable docker
 
+groups:
+  - docker
+
 users:
   - default
   - name: ${var.server.user}
-    groups: sudo
+    groups: sudo,docker
     sudo: "ALL=(ALL) NOPASSWD:ALL"
     lock_passwd: true
     shell: /bin/bash
