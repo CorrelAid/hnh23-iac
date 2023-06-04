@@ -81,3 +81,7 @@ variable "directus_domain"{
   type = string
   default = "kdb-cms"
 }
+
+variable "machine_public_key" {
+type = string
+}
