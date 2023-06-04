@@ -1,0 +1,6 @@
+[servers]
+server ansible_host=128.140.39.173
+
+[all:vars]
+ansible_user=user
+    
