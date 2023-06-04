@@ -16,11 +16,11 @@ terraform {
 }
 
 
-provider "hcloud" {
+provider "hetznercloud/hcloud" {
 
 }
 
-provider "hetznerdns" {
+provider "timohirt/hetznerdns" {
 }
 
 
