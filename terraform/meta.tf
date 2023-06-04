@@ -17,5 +17,5 @@ terraform {
 }
 
 provider "github" {
-  owner=correlaid
+  
 }
