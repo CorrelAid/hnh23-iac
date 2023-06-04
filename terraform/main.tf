@@ -36,8 +36,8 @@ resource "hcloud_firewall" "firewall" {
 
 }
 
-resource "hcloud_ssh_key" "user" {
-  name       = "user"
+resource "hcloud_ssh_key" "main" {
+  name       = var.ssh_key_name
   public_key = var.ssh_key
 }
 
@@ -57,7 +57,7 @@ resource "hcloud_server" "main" {
   location    = var.server.location
   backups     = var.server.backups
   firewall_ids = [hcloud_firewall.firewall.id]
-  ssh_keys    = ["user"]
+  ssh_keys    = [var.ssh_key_name]
   user_data = <<EOF
 #cloud-config
 locale: en_US.UTF-8
