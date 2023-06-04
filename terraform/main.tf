@@ -142,37 +142,7 @@ resource "random_password" "secret" {
 
 
 
-resource "github_repository_file" "hosts" {
-  repository = "hnh23-iac"
-  branch     = "main"
-  file       = "./ansible/hosts"
-  content = templatefile("inventory.tmpl",
-    {
-      ip = hcloud_server.main.ipv4_address
-    }
-  )
-  commit_message      = "Add hosts"
-  commit_author       = "Terraform User"
-  commit_email        = "terraform@example.com"
-  overwrite_on_create = true
-}
 
-
-resource "github_repository_file" "group_vars" {
-  repository = "hnh23-iac"
-  branch     = "main"
-  file       = "./ansible/group_vars/main.yml"
-  content = templatefile("group_vars.tmpl",
-    {
-      domain    = "${var.directus_domain}.${var.zone}"
-      smtp_user = var.smtp_user
-    }
-  )
-  commit_message      = "Add group_vars"
-  commit_author       = "Terraform User"
-  commit_email        = "terraform@example.com"
-  overwrite_on_create = true
-}
 
 
 
