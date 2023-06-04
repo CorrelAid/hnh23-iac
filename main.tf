@@ -1,5 +1,10 @@
 module "docker_host" {
   source = "./docker_host"
+  smtp_pw = var.smtp_pw
+  smtp_user = var.smtp_user 
+  directus_admin_pw = var.directus_admin_pw 
+  directus_admin_mail = var.directus_admin_mail
+  ssh_key = var.ssh_key
 }
 
 provider "docker" {
