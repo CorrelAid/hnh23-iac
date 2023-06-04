@@ -145,8 +145,8 @@ resource "local_file" "ansible_vault" {
     {
       directus_admin_pw    = var.directus_admin_pw
       directus_admin_mail  = var.directus_admin_mail
-      directus_key         = random_password.key
-      directus_secret      = random_password.secret
+      directus_key         = random_password.key.result
+      directus_secret      = random_password.secret.result
       smtp_pw       = var.smtp_pw
 
     }
