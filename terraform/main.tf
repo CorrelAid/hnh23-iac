@@ -145,7 +145,7 @@ data "github_repository" "main" {
 }
 
 resource "github_repository_file" "hosts" {
-  repository = github_repository.main.name
+  repository = data.github_repository.main.name
   branch     = "main"
   file       = "./ansible/hosts"
   content = templatefile("inventory.tmpl",
@@ -161,7 +161,7 @@ resource "github_repository_file" "hosts" {
 
 
 resource "github_repository_file" "group_vars" {
-  repository = github_repository.main.name
+  repository = data.github_repository.main.name
   branch     = "main"
   file       = "./ansible/group_vars/main.yml"
   content = templatefile("group_vars.tmpl",
