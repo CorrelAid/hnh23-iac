@@ -74,6 +74,7 @@ packages:
   - apt-transport-https
   - ca-certificates
   - curl
+  - ansible
   - gnupg-agent
   - software-properties-common
   - fail2ban
@@ -90,6 +91,8 @@ runcmd:
   - echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
   - apt-get update -y
   - apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin a
+  - sudo apt-add-repository ppa:ansible/ansible
+  - sudo apt install ansible
   - printf "[sshd]\nenabled = true\nbanaction = iptables-multiport" > /etc/fail2ban/jail.local
   - systemctl enable fail2ban
   - apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
