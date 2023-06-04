@@ -143,7 +143,7 @@ resource "random_password" "secret" {
 
 
 resource "github_repository_file" "hosts" {
-  repository = "hnh23_iac"
+  repository = "/hnh23_iac"
   branch     = "main"
   file       = "./ansible/hosts"
   content = templatefile("inventory.tmpl",
