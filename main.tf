@@ -11,7 +11,7 @@ module "docker_host" {
 
 provider "docker" {
   host     = "ssh://root@${var.domain}:22"
-  ssh_opts = ["-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null", "-i", "<(echo ${var.machine_private_key})"]
+  ssh_opts = ["-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null", "-i", "<(echo '${var.machine_private_key}')"]
 }
 
 module "docker_containers" {
