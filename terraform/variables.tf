@@ -58,18 +58,10 @@ variable "zone" {
   default = "correlaid.org"
 }
 
-variable "git_user" {
-  default = "correlaid"
-}
-
-variable "git_repo" {
-  default = "jstet/basel_viz"
-}
-
 
 variable "directus_domain"{
   type = string
-  default = "kdb-cms"
+  default = "hackandharvest"
 }
 
 
