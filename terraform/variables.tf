@@ -4,10 +4,10 @@ variable "server" {
   description = "Server configuration map"
   default = {
     name        = "docker-host"
-    server_type = "ccx22"
+    server_type = "ccx12"
     image       = "ubuntu-22.04"
     location    = "nbg1"
-    backups     = false
+    backups     = true
     user = "user"
   }
 }
