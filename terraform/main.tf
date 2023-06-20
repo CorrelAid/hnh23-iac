@@ -46,14 +46,6 @@ resource "hcloud_ssh_key" "machine" {
   public_key = var.machine_ssh_key_public
 }
 
-resource "hcloud_volume" "main" {
-  name      = "docker_data_volume"
-  size      = var.volume_size
-  location  = var.server.location
-  automount = false
-  format    = var.volume_filesystem
-}
-
 # Create server for deployment
 resource "hcloud_server" "main" {
   name         = var.server.name
@@ -85,10 +77,6 @@ packages:
   - unattended-upgrades
 
 runcmd:
-  - mkfs.${var.volume_filesystem} ${var.volume_filesystem == "xfs" ? "-f" : "-F"} ${hcloud_volume.main.linux_device}
-  - mkdir /mnt/${hcloud_volume.main.name}
-  - mount -o discard,defaults ${hcloud_volume.main.linux_device} /mnt/${hcloud_volume.main.name}
-  - echo '${hcloud_volume.main.linux_device} /mnt/${hcloud_volume.main.name} ${var.volume_filesystem} discard,nofail,defaults 0 0' >> /etc/fstab
   - install -m 0755 -d /etc/apt/keyrings
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
   - chmod a+r /etc/apt/keyrings/docker.gpg
@@ -108,7 +96,6 @@ runcmd:
   - sed -i -e '/^\(#\|\)AllowAgentForwarding/s/^.*$/AllowAgentForwarding no/' /etc/ssh/sshd_config
   - sed -i -e '/^\(#\|\)AuthorizedKeysFile/s/^.*$/AuthorizedKeysFile .ssh\/authorized_keys/' /etc/ssh/sshd_config
   - sed -i '$a AllowUsers holu' /etc/ssh/sshd_config
-  - sed -i -e "s|ExecStart=/usr/bin/dockerd|ExecStart=/usr/bin/dockerd --data-root=/mnt/${hcloud_volume.main.name}|g" /lib/systemd/system/docker.service
   - systemctl daemon-reload
   - systemctl restart docker
   - systemctl enable docker
@@ -130,12 +117,6 @@ users:
 final_message: "The system is ready, after $UPTIME seconds"
 
 EOF
-}
-
-resource "hcloud_volume_attachment" "main" {
-  volume_id = hcloud_volume.main.id
-  server_id = hcloud_server.main.id
-  automount = true
 }
 
 resource "hetznerdns_record" "main" {
