@@ -83,7 +83,6 @@ packages:
   - software-properties-common
   - fail2ban
   - unattended-upgrades
-  - neofetch
 
 runcmd:
   - mkfs.${var.volume_filesystem} ${var.volume_filesystem == "xfs" ? "-f" : "-F"} ${hcloud_volume.main.linux_device}
